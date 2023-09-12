@@ -15,6 +15,7 @@ ENV FUSEKI_ARCHIVE http://archive.apache.org/dist/
 VOLUME /fuseki
 ENV FUSEKI_BASE /fuseki
 ENV FUSEKI_HOME /jena-fuseki
+ENV TZ=Europe/Ljubljana
 
 WORKDIR /tmp
 RUN echo "$FUSEKI_SHA512  fuseki.tar.gz" > fuseki.tar.gz.sha512
