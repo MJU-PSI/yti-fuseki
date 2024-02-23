@@ -1,5 +1,12 @@
 FROM java:8-jre-alpine@sha256:6a8cbe4335d1a5711a52912b684e30d6dbfab681a6733440ff7241b05a5deefd
-RUN apk add --update pwgen bash wget ca-certificates && rm -rf /var/cache/apk/*
+
+# Install common tools
+RUN set -x \
+        && apk update && apk upgrade \
+        && apk add --no-cache wget \
+        && apk add --no-cache pwgen \
+        && apk add --no-cache bash \
+        && apk add --no-cache ca-certificates
 
 # Fuseki 3.13.1
 ENV FUSEKI_SHA512 1960d3e057cdcaaa0811b33b57b86145fb0fb675eee1a6dd2d27a111313689e70ba8fa36b9ca66784cf9130ae5753bf50e32e82d9e3a7bba2786a0fc4ae7f056
@@ -19,13 +26,13 @@ ENV TZ=Europe/Ljubljana
 
 WORKDIR /tmp
 RUN echo "$FUSEKI_SHA512  fuseki.tar.gz" > fuseki.tar.gz.sha512
-RUN     wget -O fuseki.tar.gz $FUSEKI_MIRROR/jena/binaries/apache-jena-fuseki-$FUSEKI_VERSION.tar.gz || \
-        wget -O fuseki.tar.gz $FUSEKI_ARCHIVE/jena/binaries/apache-jena-fuseki-$FUSEKI_VERSION.tar.gz && \
-        sha512sum -c fuseki.tar.gz.sha512 && \
-        tar zxf fuseki.tar.gz && \
-        mv apache-jena-fuseki* $FUSEKI_HOME && \
-        rm fuseki.tar.gz* && \
-        cd $FUSEKI_HOME && rm -rf fuseki.war
+RUN wget --no-check-certificate -O fuseki.tar.gz $FUSEKI_MIRROR/jena/binaries/apache-jena-fuseki-$FUSEKI_VERSION.tar.gz || \
+        wget --no-check-certificate -O fuseki.tar.gz $FUSEKI_ARCHIVE/jena/binaries/apache-jena-fuseki-$FUSEKI_VERSION.tar.gz
+RUN sha512sum -c fuseki.tar.gz.sha512
+RUN tar zxf fuseki.tar.gz
+RUN mv apache-jena-fuseki* $FUSEKI_HOME
+RUN rm fuseki.tar.gz*
+RUN cd $FUSEKI_HOME && rm -rf fuseki.war
 
 COPY log4j.properties /jena-fuseki/log4j.properties
 COPY shiro.ini /jena-fuseki/shiro.ini
